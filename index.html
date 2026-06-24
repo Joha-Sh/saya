@@ -13,7 +13,7 @@ html,body{margin:0;overflow:hidden;background:#000;font-family:Arial}
 </style>
 </head>
 <body>
-<div id="hint">Фото: 1.jpg-6.jpg | Музыка: song.mp3</div>
+<div id="hint"></div>
 <div id="start">
 <h1>💖 LOVE GALAXY 💖</h1>
 <button onclick="startGalaxy()">Открыть галактику</button>
@@ -25,7 +25,7 @@ html,body{margin:0;overflow:hidden;background:#000;font-family:Arial}
 <script>
 const scene=new THREE.Scene();
 const camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.1,5000);
-camera.position.z=1200;
+camera.position.z=1800;
 
 const renderer=new THREE.WebGLRenderer({antialias:true});
 renderer.setSize(innerWidth,innerHeight);
@@ -104,7 +104,7 @@ function startGalaxy(){
  function fly(){
    z-=12;
    camera.position.z=z;
-   if(z>350) requestAnimationFrame(fly);
+   if(z>700) requestAnimationFrame(fly);
  }
  fly();
 }
@@ -118,6 +118,38 @@ addEventListener('mousemove',e=>{
  galaxy.rotation.y+=(e.clientX-lx)*0.005;
  galaxy.rotation.x+=(e.clientY-ly)*0.005;
  lx=e.clientX;ly=e.clientY;
+});
+let lastDistance = 0;
+
+function getDistance(touches){
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+window.addEventListener('touchmove', (e) => {
+
+    if(e.touches.length === 2){
+
+        const distance = getDistance(e.touches);
+
+        if(lastDistance > 0){
+
+            camera.position.z -= (distance - lastDistance) * 3;
+
+            camera.position.z = Math.max(
+                300,
+                Math.min(3000, camera.position.z)
+            );
+        }
+
+        lastDistance = distance;
+    }
+
+}, { passive:false });
+
+window.addEventListener('touchend', () => {
+    lastDistance = 0;
 });
 
 function animate(){
